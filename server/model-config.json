@@ -12,5 +12,9 @@
       "../common/mixins",
       "./mixins"
     ]
+  },
+  "transaction": {
+    "dataSource": "mysqlDs",
+    "public": false
   }
 }

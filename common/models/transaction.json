@@ -1,0 +1,121 @@
+{
+  "name": "transaction",
+  "plural": "transactions",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true,
+    "mysql": {
+      "table": "transactions"
+    }
+  },
+  "properties": {
+    "id": {
+      "type": "number",
+      "required": true
+    },
+    "fromChainID": {
+      "type": "number",
+      "required": true,
+      "mysql": {
+        "columnName": "from_chain_id"
+      }
+    },
+    "fromTxHash": {
+      "type": "string",
+      "required": true,
+      "mysql": {
+        "columnName": "from_tx_hash",
+        "dataType": "varchar(128)"
+      }
+    },
+    "fromAddress": {
+      "type": "string",
+      "required": true,
+      "mysql": {
+        "columnName": "from_address",
+        "dataType": "varchar(64)"
+      }
+    },
+    "toChainID": {
+      "type": "number",
+      "required": true,
+      "mysql": {
+        "columnName": "to_chain_id"
+      }
+    },
+    "toTxHash": {
+      "type": "string",
+      "mysql": {
+        "columnName": "to_tx_hash",
+        "dataType": "varchar(128)"
+      }
+    },
+    "toAddress": {
+      "type": "string",
+      "required": true,
+      "mysql": {
+        "columnName": "to_address",
+        "dataType": "varchar(64)"
+      }
+    },
+    "amount": {
+      "type": "string",
+      "required": true,
+      "mysql": {
+        "columnName": "amount",
+        "dataType": "varchar(32)"
+      }
+    },
+    "displayAmount": {
+      "type": "string",
+      "required": true,
+      "mysql": {
+        "columnName": "display_amount",
+        "dataType": "varchar(32)"
+      }
+    },
+    "status": {
+      "type": "string",
+      "required": true,
+      "mysql": {
+        "columnName": "status"
+      }
+    },
+    "timestamp": {
+      "type": "number",
+      "required": true,
+      "mysql": {
+        "columnName": "timestamp"
+      }
+    },
+    "createdAt": {
+      "type": "date",
+      "required": true,
+      "mysql": {
+        "columnName": "created_at"
+      }
+    },
+    "updatedAt": {
+      "type": "date",
+      "mysql": {
+        "columnName": "updated_at"
+      }
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {},
+  "indexes": {
+    "from_chain_id_from_tx_hash_index": {
+      "keys": {
+        "from_chain_id": 1,
+        "from_tx_hash": 2
+      },
+      "options": {
+        "unique": true
+      }
+    }
+  }
+}
