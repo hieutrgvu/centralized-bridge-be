@@ -2,15 +2,8 @@
 
 module.exports = function (Status) {
   Status.getSyncingBlock = async function (cfg) {
-    return new Promise((resolve, reject) => {
-      Status.dataSource.connector.execute(
-        `select "value" as syncingBlock
-         from status
-         where "key" = '${cfg.name + 'SyncingBlock'}'`,
-        (err, result) => {
-          if (err) reject(err);
-          else resolve(result[0] === null ? result[0].syncingBlock : null);
-        });
-    });
+    let result = await Status.findById(cfg.name + 'SyncingBlock');
+    const block = result === null ? null : Number(result.value);
+    return block || cfg.syncingBlock;
   }
 }
