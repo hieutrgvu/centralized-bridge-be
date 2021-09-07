@@ -37,7 +37,7 @@ module.exports = function (Transaction) {
         let events = await bridge.getPastEvents('Transfer', {fromBlock: syncingBlock, toBlock: toBlock});
         logger.info('syncTx: events.length:', events.length);
         for (const e of events) {
-          Transaction.findOrCreate({fromChainID: cfg.id, fromTxHash: e.transactionHash}, {
+          let data = {
             fromChainID: cfg.id,
             fromTxHash: e.transactionHash,
             fromAddress: e.returnValues.from,
@@ -49,19 +49,21 @@ module.exports = function (Transaction) {
             status: constants.STATUS_CONFIRMING,
             timestamp: e.returnValues.timestamp,
             retry: 0
-          });
+          }
+          logger.info('syncTx: data to insert db:', data);
+          await Transaction.findOrCreate({where: {fromChainID: cfg.id, fromTxHash: e.transactionHash}}, data);
         }
 
         syncingBlock = toBlock + 1;
         await Transaction.app.models.Status.upsert({'key': cfg.name + 'SyncingBlock', value: syncingBlock});
         if (toBlock === currentBlock) {
-          await sleep(5 * 1000);
+          await sleep(constants.TASK_SLEEP_MS);
           currentBlock = await web3.eth.getBlockNumber();
-        } else await sleep(500);
+        } else await sleep(constants.TASK_SLEEP_MS/10);
         toBlock = syncingBlock + cfg.step - 1 < currentBlock ? syncingBlock + cfg.step - 1 : currentBlock;
       } catch (e) {
         logger.error('syncTx: err:', e);
-        await sleep(10 * 1000);
+        await sleep(constants.ERROR_SLEEP_MS);
       }
     }
   }
@@ -86,10 +88,10 @@ module.exports = function (Transaction) {
             await Transaction.upsert(txn);
           }
         }
-        await sleep(5 * 1000);
+        await sleep(constants.TASK_SLEEP_MS);
       } catch (e) {
         logger.error('confirmTx: err:', e);
-        await sleep(10 * 1000);
+        await sleep(constants.ERROR_SLEEP_MS);
       }
     }
   }
@@ -128,10 +130,10 @@ module.exports = function (Transaction) {
           }
           await Transaction.upsert(txn);
         }
-        await sleep(5 * 1000);
+        await sleep(constants.TASK_SLEEP_MS);
       } catch (e) {
         logger.error('processTx: err:', e);
-        await sleep(10 * 1000);
+        await sleep(constants.ERROR_SLEEP_MS);
       }
     }
   }
