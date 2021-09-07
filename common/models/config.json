@@ -1,12 +1,30 @@
 {
-  "addresses": {
-    "bsc": {
-      "token": "0x1EA55E6b663E63f5e1f635246BB263e5ADdA5976",
-      "bridge": "0x56d4c1A6E6A6De3778476A7c1ABE132a2fE8BE36"
+  "network": {
+    "97": {
+      "name": "bscTestnet",
+      "id": 97,
+      "rpcs": [
+        "https://data-seed-prebsc-1-s1.binance.org:8545"
+      ],
+      "step": 1000,
+      "syncingBlock": 12143535,
+      "address": {
+        "token": "0x1EA55E6b663E63f5e1f635246BB263e5ADdA5976",
+        "bridge": "0x56d4c1A6E6A6De3778476A7c1ABE132a2fE8BE36"
+      }
     },
-    "polygon": {
-      "token": "0x50b6D802f32fF8021A75b491EE638C475Ce832f1",
-      "bridge": "0xD0deE265E191491dc544D24242E95EC563eB3F06"
+    "80001": {
+      "name": "polygonTestnet",
+      "id": 80001,
+      "rpcs": [
+        "https://rpc-mumbai.maticvigil.com"
+      ],
+      "step": 1000,
+      "syncingBlock": 18567825,
+      "address": {
+        "token": "0x50b6D802f32fF8021A75b491EE638C475Ce832f1",
+        "bridge": "0xD0deE265E191491dc544D24242E95EC563eB3F06"
+      }
     }
   }
 }

@@ -13,6 +13,10 @@
       "./mixins"
     ]
   },
+  "status": {
+    "dataSource": "mysqlDs",
+    "public": false
+  },
   "transaction": {
     "dataSource": "mysqlDs",
     "public": false

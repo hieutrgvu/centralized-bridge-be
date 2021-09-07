@@ -89,6 +89,12 @@
         "columnName": "timestamp"
       }
     },
+    "block": {
+      "type": "number",
+      "mysql": {
+        "columnName": "block"
+      }
+    },
     "createdAt": {
       "type": "date",
       "required": true,
@@ -98,6 +104,7 @@
     },
     "updatedAt": {
       "type": "date",
+      "required": true,
       "mysql": {
         "columnName": "updated_at"
       }
