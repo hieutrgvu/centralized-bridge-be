@@ -89,10 +89,11 @@
         "columnName": "timestamp"
       }
     },
-    "block": {
+    "retry": {
       "type": "number",
+      "required": true,
       "mysql": {
-        "columnName": "block"
+        "columnName": "retry"
       }
     },
     "createdAt": {

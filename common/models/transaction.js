@@ -4,6 +4,7 @@ const logger = require('../utils/logger').logger;
 const BridgeABI = require('../abi/bridge.json');
 const config = require('./config.json');
 const constants = require('./constants');
+const secrets = require('./secrets.json');
 const {getWeb3} = require('../utils/web3')
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -47,7 +48,7 @@ module.exports = function (Transaction) {
             displayAmount: web3.utils.fromWei(e.returnValues.amount),
             status: constants.STATUS_CONFIRMING,
             timestamp: e.returnValues.timestamp,
-            block: e.blockNumber
+            retry: 0
           });
         }
 
@@ -93,11 +94,54 @@ module.exports = function (Transaction) {
     }
   }
 
+  Transaction.processTx = async function (cfg) {
+    logger.info('processTx: start chain id', cfg.id);
+
+    while (true) {
+      try {
+        let txns = await Transaction.find({
+          where: {fromChainID: cfg.id, status: constants.STATUS_TRANSFERRING, retry: {lt: constants.MAX_RETRY}},
+          limit: 1, order: 'id asc'
+        });
+        logger.info(`processTx: txns.length of chain ${cfg.id}: ${txns.length}`);
+
+        for (let txn of txns) {
+          try {
+            logger.info('processTx: process bridge:', txn)
+            let web3 = getWeb3(config.network[txn.toChainID].rpcs);
+            const account = web3.eth.accounts.privateKeyToAccount(secrets.network[txn.toChainID].privateKey);
+            web3.eth.accounts.wallet.add(account);
+            web3.eth.defaultAccount = account.address;
+            const bridge = new web3.eth.Contract(BridgeABI, config.network[txn.toChainID].address.bridge);
+
+            let method = bridge.methods.mint(txn.toAddress, txn.amount, txn.fromChainID, txn.fromTxHash);
+            const estimatedGas = await method.estimateGas({from: account.address});
+            const tx = await method.send({from: account.address, gas: estimatedGas});
+
+            txn.status = constants.STATUS_SUCCESS;
+            txn.toTxHash = tx.transactionHash;
+            logger.info('processTx: bridge done')
+          } catch (e) {
+            txn.retry += 1;
+            if (txn.retry >= constants.MAX_RETRY) txn.status = constants.STATUS_FAILED;
+            logger.error('processTx: failed to bridge, err:', e)
+          }
+          await Transaction.upsert(txn);
+        }
+        await sleep(5 * 1000);
+      } catch (e) {
+        logger.error('processTx: err:', e);
+        await sleep(10 * 1000);
+      }
+    }
+  }
+
   Transaction.scanning = async function () {
     for (let id in config.network) {
       const cfg = config.network[id];
       Transaction.syncTx(cfg);
       Transaction.confirmTx(cfg);
+      Transaction.processTx(cfg);
     }
   }
 };
