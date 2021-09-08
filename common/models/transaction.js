@@ -103,7 +103,7 @@ module.exports = function (Transaction) {
       try {
         let txns = await Transaction.find({
           where: {fromChainID: cfg.id, status: constants.STATUS_TRANSFERRING, retry: {lt: constants.MAX_RETRY}},
-          limit: 1, order: 'id asc'
+          limit: 5, order: 'id asc'
         });
         logger.info(`processTx: txns.length of chain ${cfg.id}: ${txns.length}`);
 
